@@ -24,6 +24,7 @@ docker network ls
 
 # Probar desde navegador o curl Equipo anfitrión (redirección de puertos correcta)
 http://localhost:8080
+http://localhost:9090 --> interfaz web prometheus
 
 
 
