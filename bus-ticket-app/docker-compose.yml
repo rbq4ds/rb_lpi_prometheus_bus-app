@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # Servicio de Nginx (Proxy Inverso + Frontend)
+  proxy:
+    image: rbq4ds/reverse-proxy-nginx:v1  # Imagen desde Docker Hub
+    ports:
+      - "80:80"  # Accesible desde el host en http://localhost
+    depends_on:
+      - user-auth
+      - bus-reservation
+      - payment-gateway
+      - route-scheduler
+    networks:
+      - app-network
+
+  user-auth:
+    image: rbq4ds/user-auth:v1  # Imagen desde Docker Hub
+    ports:
+      - "5001:5001"
+    networks:
+      - app-network
+      
+  bus-reservation:
+    image: rbq4ds/bus-reservation:v1  # Imagen desde Docker Hub
+    ports:
+      - "5002:5002"
+    networks:
+      - app-network
+      
+  payment-gateway:
+    image: rbq4ds/payment-gateway:v1  # Imagen desde Docker Hub
+    ports:
+      - "5003:5003"
+    networks:
+      - app-network
+
+  route-scheduler:
+    image: rbq4ds/route-scheduler:v1  # Imagen desde Docker Hub
+    ports:
+      - "5004:5004"
+    networks:
+      - app-network
+      
+  prometheus: # Nuevo servicio
+    image: prom/prometheus:latest
+    volumes:
+      - /vagrant/bus-ticket-app/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+networks:
+  app-network:
+    driver: overlay
+
+
+
